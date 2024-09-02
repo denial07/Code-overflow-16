@@ -85,7 +85,6 @@ li {
     margin: 5px 0;
     padding: 10px;
     border-radius: 4px;
-    text-align: left;
     display: flex;
     align-items: center;
     color: #000; /* Text color for better contrast */

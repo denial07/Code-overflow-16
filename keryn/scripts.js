@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to load transactions from Local Storage
     function loadTransactions() {
         const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-        transactionList.innerHTML = transactions.map((tx, index) => `
-            <li class="${categoryClasses[tx.category] || 'other'}">
+        transactionList.innerHTML = transactions.map((tx, index) => 
+            `<li class="${categoryClasses[tx.category] || 'other'}">
                 <span class="category">${tx.category}</span>: 
                 ${tx.type}: $${tx.amount} - ${tx.description} (Date: ${tx.date})
                 <div class="action-buttons">
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
-            </li>
-        `).join('');
+            </li>`
+        ).join('');
     }
     loadTransactions();
 
