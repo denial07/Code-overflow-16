@@ -1,4 +1,4 @@
-.to-do-list-container {
+.expense-container {
     background-color: white;
     border-radius: 10px;
     width: 60vw;
@@ -8,7 +8,7 @@
     color: black;
   }
   
-  #todo-list-Body .input-field {
+  #expenses-body .input-field {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -18,7 +18,7 @@
     margin-bottom: 25px;
   }
   
-  #todo-list-Body .input-field input {
+  #expenses-body .input-field input {
     flex: 1;
     border: none;
     outline: none;
@@ -27,7 +27,7 @@
     font-weight: 14px;
   }
   
-  #todo-list-Body .input-field #add-task  {
+  #expenses-body .input-field #add-task  {
     outline: none;
     padding: 16px 50px;
     font-size: 16px;
@@ -36,14 +36,14 @@
     
   }
   
-  #todo-list-Body h2 {
+  #expenses-body h2 {
     color: #002765;
     display: flex;
     align-items: center;
     margin-bottom: 20px;
   }
   
-  #todo-list-Body .main ul li {
+  #expenses-body .main ul li {
     list-style: none;
     font-size: 17px;
     padding: 12px 8px;
@@ -55,7 +55,7 @@
     position: relative; /* Ensure the li is the positioning context for the span */
 }
   
-  #todo-list-Body .main ul li span {
+  #expenses-body .main ul li span {
     position: absolute;
     right: 10px; /* Adjusted from 0 to 10px for better positioning */
     top: 5px;
@@ -69,29 +69,29 @@
     cursor: pointer; /* Added for better user experience */
   }
   
-  #todo-list-Body .main ul li span:hover {
+  #expenses-body .main ul li span:hover {
     background: #edeef0;
   }
   
 
-  #todo-list-Body .main ul li::before {
+  #expenses-body .main ul li::before {
     content: '';
     height: 28px;
     width: 28px;
     border-radius: 50%;
-    background-image: url(./pictures/unchecked.png);
+    background-image: url(/IMAGES/unchecked.png);
     background-size: cover;
     background-position: center;
     margin-right: 12px; /* Space between the image and the text */
 }
   
-  #todo-list-Body .main ul li.checked {
+  #expenses-body .main ul li.checked {
     color: #555;
     text-decoration: line-through;
   }
   
-  #todo-list-Body .main ul li.checked::before {
-    background-image: url(./pictures/checked.png);
+  #expenses-body .main ul li.checked::before {
+    background-image: url(/IMAGES/checked.png);
   }
 
  

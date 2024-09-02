@@ -1,7 +1,7 @@
 window.onload = function() {
     function addTask() {
-        var inputBox = document.getElementById("todo-input-box");
-        var listContainer = document.getElementById("todo-list-container");
+        var inputBox = document.getElementById("expense-input-box");
+        var listContainer = document.getElementById("expense-container");
 
         if (inputBox.value === '') {
             alert("You must write something!!!");
