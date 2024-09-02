@@ -16,20 +16,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to load transactions from Local Storage
     function loadTransactions() {
         const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-        transactionList.innerHTML = transactions.map((tx, index) => 
-            `<li class="${categoryClasses[tx.category] || 'other'}">
+        transactionList.innerHTML = transactions.map((tx, index) => `
+            <li class="${categoryClasses[tx.category] || 'other'}">
                 <span class="category">${tx.category}</span>: 
-                ${tx.type}: $${tx.amount} - ${tx.description} (Date: ${tx.date})
+                ${tx.type}: $${tx.amount.toFixed(2)} - ${tx.description} (Date: ${tx.date})
                 <div class="action-buttons">
                     <button onclick="editTransaction(${index})">Edit</button>
                     <button class="delete-btn" onclick="deleteTransaction(${index})">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
-            </li>`
-        ).join('');
+            </li>
+        `).join('');
     }
-    loadTransactions();
 
     // Function to calculate spending for a given month and year
     function calculateMonthlySpending(year, month) {
@@ -53,9 +52,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentMonthSpending = calculateMonthlySpending(currentYear, currentMonth);
         const previousMonthSpending = calculateMonthlySpending(previousMonthYear, previousMonth);
+        
+        let percentageChange = 0;
+        let percentageText = '';
+
+        if (previousMonthSpending > 0) {
+            percentageChange = ((currentMonthSpending - previousMonthSpending) / previousMonthSpending) * 100;
+            percentageText = percentageChange > 0
+                ? `Increase: ${percentageChange.toFixed(2)}%`
+                : `Decrease: ${Math.abs(percentageChange).toFixed(2)}%`;
+        } else if (previousMonthSpending === 0 && currentMonthSpending > 0) {
+            percentageText = 'New Spending This Month';
+        } else {
+            percentageText = 'No spending in previous month';
+        }
 
         document.getElementById('current-month-spending').textContent = `Spending this month: $${currentMonthSpending.toFixed(2)}`;
         document.getElementById('previous-month-spending').textContent = `Spending last month: $${previousMonthSpending.toFixed(2)}`;
+        document.getElementById('spending-difference').textContent = `Difference: $${(currentMonthSpending - previousMonthSpending).toFixed(2)}`;
+        document.getElementById('percentage-difference').textContent = `Percentage change from last month: ${percentageText}`;
     }
 
     // Function to set the default date to today
@@ -95,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDefaultDate();
     
     // Initial display of spending comparison
+    loadTransactions(); // Load transactions when the page first loads
     displaySpendingComparison();
 
     // Edit a transaction
