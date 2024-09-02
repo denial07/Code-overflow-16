@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+h2 {
+    margin-top: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 8px;
+    margin-left: 5px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ff0000; /* Red color for delete button */
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    color: #cc0000; /* Darker red on hover */
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    color: #000; /* Text color for better contrast */
+}
+
+.category {
+    font-weight: bold;
+    margin-right: 10px; /* Space between category and transaction details */
+}
+
+/* Category Colors */
+.food .category {
+    color: #FF6347; /* Tomato */
+}
+
+.transport .category {
+    color: #4682B4; /* SteelBlue */
+}
+
+.entertainment .category {
+    color: #32CD32; /* LimeGreen */
+}
+
+.utilities .category {
+    color: #FFD700; /* Gold */
+}
+
+.other .category {
+    color: #6A5ACD; /* SlateBlue */
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
