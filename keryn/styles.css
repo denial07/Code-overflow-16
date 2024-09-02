@@ -79,6 +79,7 @@ button:hover {
 ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 li {
@@ -87,7 +88,9 @@ li {
     border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Ensure that items are spaced between the start and end */
     color: #000; /* Text color for better contrast */
+    position: relative; /* To help with positioning the action-buttons */
 }
 
 .category {
@@ -119,4 +122,5 @@ li {
 .action-buttons {
     display: flex;
     gap: 5px;
+    margin-left: auto; /* Pushes buttons to the right */
 }
