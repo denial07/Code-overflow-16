@@ -1,30 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Budgeting System</title>
-    <link rel="stylesheet" href="hackatonstyles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget App</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="hackaton.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Smart Budgeting System</h1>
-        <div class="budget-input">
-            <label for="monthly-budget">Enter your monthly budget:</label>
-            <input type="number" id="monthly-budget" placeholder="e.g., 500">
+    <!-- Timer -->
+    <div class="wrapper">
+        <div class="container">
+            <!-- Budget Calculation -->
+            <div class="total-amount-container">
+                <h3>Set Your Budget</h3>
+                <input type="number" id="income" placeholder="Enter Income" />
+                <input type="number" id="subscription" placeholder="Enter Subscription" />
+                <input type="number" id="savings" placeholder="Enter Savings" />
+                <button class="submit" id="calculate-budget">Calculate Budget</button>
+                <p id="budget-output">Budget: $<span id="budget">0</span></p>
+                <button class="submit" id="suggested-budget">Suggested Budget</button>
+                <button class="submit" id="custom-budget">Custom Budget</button>
+                <div id="suggested-budget-container" class="hide">
+                    <h4>Suggested Budget</h4>
+                    <p id="food-suggested">Food: $<span id="food-budget-suggested">0</span></p>
+                    <p id="transport-suggested">Transport: $<span id="transport-budget-suggested">0</span></p>
+                    <p id="entertainment-suggested">Entertainment: $<span id="entertainment-budget-suggested">0</span></p>
+                    <p id="fashion-suggested">Fashion: $<span id="fashion-budget-suggested">0</span></p>
+                    <p id="others-suggested">Others: $<span id="others-budget-suggested">0</span></p>
+                </div>
+                <div id="custom-budget-container" class="hide">
+                    <h4>Customize Your Budget</h4>
+                    <input type="text" id="food-budget" placeholder="Food Budget (%) or Amount" />
+                    <input type="text" id="transport-budget" placeholder="Transport Budget (%) or Amount" />
+                    <input type="text" id="entertainment-budget" placeholder="Entertainment Budget (%) or Amount" />
+                    <input type="text" id="fashion-budget" placeholder="Fashion Budget (%) or Amount" />
+                    <input type="text" id="others-budget" placeholder="Others Budget (%) or Amount" />
+                    <button class="submit" id="apply-custom-budget">Apply Custom Budget</button>
+                    <button class="submit" id="back-to-suggested-budget">Back to Suggested Budget</button>
+                </div>
+            </div>
+            <!-- Expense Input -->
+            <div class="user-amount-container">
+                <h3>Add Expense</h3>
+                <input type="text" id="product-title" placeholder="Enter Title of Product" />
+                <input type="number" id="user-amount" placeholder="Enter Cost of Product" />
+                <select id="category-select">
+                    <option value="food">Food</option>
+                    <option value="transport">Transport</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="others">Others</option>
+                </select>
+                <button class="submit" id="add-expense">Add Expense</button>
+                <p id="product-title-error" class="hide error">Values cannot be empty</p>
+                <p id="product-cost-error" class="hide error">Cost must be a valid number</p>
+            </div>
+            <!-- Output -->
+            <div class="output-container flex-space">
+                <div>
+                    <p>Total Budget</p>
+                    <span id="amount">0</span>
+                </div>
+                <div>
+                    <p>Expenses</p>
+                    <span id="expenditure-value">0</span>
+                </div>
+                <div>
+                    <p>Balance</p>
+                    <span id="balance-amount">0</span>
+                </div>
+            </div>
         </div>
-        <div class="expense-input">
-            <label for="expense">Enter an expense:</label>
-            <input type="number" id="expense" placeholder="e.g., 50">
-            <button onclick="addExpense()">Add Expense</button>
+        <!-- Cuurent Months History -->
+        <div class="list">
+            <h3>Current Months Expense History</h3>
+            <div class="list-container" id="list"></div>
         </div>
-        <div class="results">
-            <p>Budget: $<span id="budget-amount">0</span></p>
-            <p>Expenses: $<span id="total-expenses">0</span></p>
-            <p>Remaining Budget: $<span id="remaining-budget">0</span></p>
+        <!-- Category Bar -->
+        <div class="category-bar">
+            <h3>Category Spending</h3>
+            <p id="food-category">Food: $<span id="food-category-spent">0</span></p>
+            <p id="transport-category">Transport: $<span id="transport-category-spent">0</span></p>
+            <p id="entertainment-category">Entertainment: $<span id="entertainment-category-spent">0</span></p>
+            <p id="fashion-category">Fashion: $<span id="fashion-category-spent">0</span></p>
+            <p id="others-category">Others: $<span id="others-category-spent">0</span></p>
         </div>
-        <div id="alert-message"></div>
+        <!-- New Section for Overall Expense History -->
+        <div class="overall-history">
+            <h3>Overall Expense History</h3>
+            <div class="overall-history-container" id="overall-history-list"></div>
+        </div>
+        <!-- Timer Alert -->
+        <div id="alert-box" class="hide"></div>
+        <!-- Comparison -->
+        <div id="comparison" class="hide"></div>
     </div>
-    <script src="hackatonscript.js"></script>
+    <!-- Script -->
+    <script src="hackaton.js"></script>
 </body>
 </html>
