@@ -27,9 +27,7 @@ const amountOutput = document.getElementById('amount');
 const expenditureValueOutput = document.getElementById('expenditure-value');
 const balanceAmountOutput = document.getElementById('balance-amount');
 const alertBox = document.getElementById('alert-box');
-const timerElement = document.createElement('div'); // Create timer element
-timerElement.id = 'timer';
-document.body.insertBefore(timerElement, document.body.firstChild); // Insert timer element
+const timerElement = document.getElementById('timer'); 
 
 // Initialize budget and expenses
 let budget = 0;
@@ -41,10 +39,6 @@ let expenses = {
     others: 0
 };
 
-let timer; // Single timer variable
-let timerEndTime;
-
-// Load data from localStorage
 function loadFromLocalStorage() {
     const savedData = JSON.parse(localStorage.getItem('budgetAppData')) || {};
     budget = savedData.budget || 0;
@@ -56,7 +50,13 @@ function loadFromLocalStorage() {
     updateBalance();
     updateExpenseList();
     updateOverallExpenseList(); // Add this line
-    initializeTimer(); // Initialize timer
+
+    // Load disabled state
+    const inputsDisabled = localStorage.getItem('inputsDisabled') === 'true';
+    incomeInput.disabled = inputsDisabled;
+    subscriptionInput.disabled = inputsDisabled;
+    savingsInput.disabled = inputsDisabled;
+    calculateBudgetBtn.disabled = inputsDisabled;
 }
 
 
@@ -90,18 +90,26 @@ function updateBalance() {
 // Update expense list in DOM
 function updateExpenseList() {
     const savedList = JSON.parse(localStorage.getItem('expenseList')) || [];
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
     listContainer.innerHTML = ''; // Clear existing entries
+
     savedList.forEach(entry => {
-        const expenseEntry = document.createElement('div');
-        expenseEntry.className = 'expense-entry';
-        expenseEntry.innerHTML = `
-            <span>${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}</span>
-            <button class="edit" onclick="editExpense(this)"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button class="delete" onclick="deleteExpense(this)"><i class="fa-solid fa-trash-can"></i></button>
-        `;
-        listContainer.appendChild(expenseEntry);
+        const entryDate = new Date(entry.date);
+        if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+            const expenseEntry = document.createElement('div');
+            expenseEntry.className = 'expense-entry';
+            expenseEntry.innerHTML = `
+                <span>${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}</span>
+                <button class="edit" onclick="editExpense(this)"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button class="delete" onclick="deleteExpense(this)"><i class="fa-solid fa-trash-can"></i></button>
+            `;
+            listContainer.appendChild(expenseEntry);
+        }
     });
 }
+
 
 // Calculate and display budget
 function calculateBudget() {
@@ -113,7 +121,142 @@ function calculateBudget() {
     updateBalance();
     showSuggestedBudget();
     saveToLocalStorage();
+
+    // Disable the input fields after setting the budget
+    incomeInput.disabled = true;
+    subscriptionInput.disabled = true;
+    savingsInput.disabled = true;
+    calculateBudgetBtn.disabled = true;
+
+    // Save the disabled state to localStorage
+    localStorage.setItem('inputsDisabled', 'true');
 }
+
+// Initialize the month counter
+let month = parseInt(localStorage.getItem('monthCounter')) || 1;
+
+// Duration of the countdown in milliseconds (1 minute)
+const countdownDuration = 1 * 60 * 1000; 
+
+// Function to format time as MM:SS
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Function to update the timer display
+function updateTimer() {
+    const now = Date.now();
+    const timeRemaining = endTime - now;
+
+    if (timeRemaining <= 0) {
+        // Calculate the displayed month
+        const currentMonth = month+1; // JavaScript months are 0-11
+        const displayedMonth = ((currentMonth - 1) % 12) + 1;
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        clearInterval(timerInterval);
+        alert(`It's ${monthNames[displayedMonth - 1]}!`);
+        showAlert();
+        resetTimer();
+    } else {
+        document.getElementById('timer').textContent = formatTime(timeRemaining);
+    }
+}
+
+// Function to reset the timer
+function resetTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    
+    endTime = Date.now() + countdownDuration;
+    localStorage.setItem('endTime', endTime);
+
+    // Increment month counter and save to localStorage
+    month++;
+    localStorage.setItem('monthCounter', month);
+
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+// Get the end time from localStorage or set it if not available
+let endTime = localStorage.getItem('endTime');
+if (!endTime) {
+    endTime = Date.now() + countdownDuration;
+    localStorage.setItem('endTime', endTime);
+}
+
+// Update the timer every second
+let timerInterval = setInterval(updateTimer, 1000);
+
+// Initial call to display the timer immediately
+updateTimer();
+
+
+// Show alert message
+function showAlert() {
+    const savedAmount = budget - Object.values(expenses).reduce((a, b) => a + b, 0);
+    const goalAmount = parseFloat(savingsInput.value) || 0;
+
+    let message;
+    
+    if (savedAmount === 0) {
+        message = `Congrats on saving $${goalAmount.toFixed(2)}!`;
+    } else if (savedAmount < 0) {
+        message = `You did not manage to reach your goal of saving $${goalAmount.toFixed(2)}, try harder!`;
+    } else {
+        message = `Congrats on saving a total of $${(goalAmount + savedAmount).toFixed(2)}, reaching your goal of $${goalAmount.toFixed(2)} and saving $${savedAmount.toFixed(2)} on top of that, keep it up!`;
+    }
+
+    alert(message);
+    resetEverything();
+}
+
+
+
+// Reset everything
+function resetEverything() {
+    // Reset inputs
+    incomeInput.value = '';
+    subscriptionInput.value = '';
+    savingsInput.value = '';
+    productTitleInput.value = '';
+    userAmountInput.value = '';
+    categorySelect.value = 'food'; // or any default value
+
+    // Enable the input fields again
+    incomeInput.disabled = false;
+    subscriptionInput.disabled = false;
+    savingsInput.disabled = false;
+    calculateBudgetBtn.disabled = false;
+
+    // Reset budget and expenses
+    budget = 0;
+    expenses = {
+        food: 0,
+        transport: 0,
+        entertainment: 0,
+        fashion: 0,
+        others: 0
+    };
+
+    // Clear expense list
+    listContainer.innerHTML = '';
+
+    // Reset category spending
+    updateCategorySpending();
+
+    // Save reset data to localStorage
+    saveToLocalStorage();
+    localStorage.setItem('inputsDisabled', 'false'); // Make sure to reset the disabled state
+}
+
 
 // Show suggested budget allocations
 function showSuggestedBudget() {
@@ -228,7 +371,7 @@ function editExpense(button) {
     const entry = button.parentElement;
     const span = entry.querySelector('span');
     const textContent = span.textContent;
-    updateOverallExpenseList();
+    
     const match = textContent.match(/^(\w+)\s*-\s*(.*?)\s*-\s*\$(\d+(\.\d+)?)\s*-\s*(.+)$/);
     if (!match) {
         console.error("Failed to parse expense entry. Check format:", textContent);
@@ -281,44 +424,52 @@ function editExpense(button) {
         title: newTitle,
         amount: newAmount,
         category: newCategory,
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        edit: true
     };
 
     const newExpenseElement = document.createElement('div');
     newExpenseElement.className = 'expense-entry';
     newExpenseElement.innerHTML = `
-        <span>${newCategory.charAt(0).toUpperCase() + newCategory.slice(1)} - ${newTitle} - $${newAmount.toFixed(2)} - ${newEntry.date}</span>
+        <span>${newCategory.charAt(0).toUpperCase() + newCategory.slice(1)} - ${newTitle} - $${newAmount.toFixed(2)} - ${newEntry.date} (edit)</span>
         <button class="edit" onclick="editExpense(this)"><i class="fa-solid fa-pen-to-square"></i></button>
         <button class="delete" onclick="deleteExpense(this)"><i class="fa-solid fa-trash-can"></i></button>
     `;
     listContainer.appendChild(newExpenseElement);
-    
 
-    // Update localStorage
+    // Update localStorage and overall history
     updateLocalStorageWithEdit(textContent, newEntry);
+    updateOverallExpenseList();
 }
+
 
 // Update localStorage with edited entry
 function updateLocalStorageWithEdit(oldTextContent, newEntry) {
     let savedList = JSON.parse(localStorage.getItem('expenseList')) || [];
-
-    // Corrected the filter condition using template literals and string interpolation
+    
+    // Remove old entry
     savedList = savedList.filter(entry => 
-        `${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}` !== oldTextContent
+        `${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}${entry.edit ? ' (edit)' : ''}` !== oldTextContent
     );
 
+    // Add updated entry
     savedList.push(newEntry);
     localStorage.setItem('expenseList', JSON.stringify(savedList));
 }
 
-function deleteExpense(button) {
+// Delete expense
+function deleteExpense(button) {    
     const entry = button.parentElement;
     const span = entry.querySelector('span');
     const textContent = span.textContent;
-    updateOverallExpenseList();
 
     // Extract category and amount from the entry
-    const match = textContent.match(/^(\w+)\s*-\s*(.*?)\s*-\s*\$(\d+(\.\d+)?)\s*-\s*(.+)$/);
+    const match = textContent.match(/^(\w+)\s*-\s*(.*?)\s*-\s*\$(\d+(\.\d+)?)\s*-\s*(.+?)(\s*\(edit\))?$/);
+    if (!match) {
+        console.error("Failed to parse expense entry. Check format:", textContent);
+        return;
+    }
+
     const [, category, , amountStr] = match;
     const amount = parseFloat(amountStr);
 
@@ -334,225 +485,30 @@ function deleteExpense(button) {
 
     // Remove the entry from the list
     listContainer.removeChild(entry);
+
+    // Remove from overall history
+    deleteOverallExpenseFromHistory(textContent);
+    updateOverallExpenseList(); // Update overall history immediately
 }
 
-// Timer duration (2 minutes)
-const timerDuration = 0.5 * 60; // in seconds
 
-// Start the timer
-let isAlertShown = false; // Add this flag to prevent repeated alerts
 
-function startTimer() {
-    let timeLeft = timerDuration;
-
-    timer = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-        
-        if (timeLeft <= 0 && !isAlertShown) {
-            clearInterval(timer);
-            isAlertShown = true; // Set the flag to true
-            showAlert();
-        } else {
-            timeLeft -= 1;
-        }
-    }, 1000);
-}
-
-function startTimerWithTimeLeft(timeLeft) {
-    timer = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        if (timeLeft <= 0 && !isAlertShown) {
-            clearInterval(timer);
-            isAlertShown = true; // Set the flag to true
-            showAlert();
-        } else {
-            timeLeft -= 1;
-        }
-    }, 1000);
-}
-
-// Show alert message
-function showAlert() {
-    // Calculate the saved amount
-    const savedAmount = budget - Object.values(expenses).reduce((a, b) => a + b, 0);
-
-    // Calculate the goal amount
-    const goalAmount = parseFloat(savingsInput.value) || 0;
-
-    // Construct the message using the ternary operator with template literals
-    const message = savedAmount >= goalAmount
-        ? `Congrats on reaching your goal and saving $${savedAmount.toFixed(2)}, keep it up!`
-        : `You did not manage to reach your goal of saving $${goalAmount.toFixed(2)}, try harder!`;
-
-    // Show the alert
-    alert(message);
-
-    // Reset everything and reinitialize timer
-    resetEverything();
-    initializeTimer(); // Call to restart timer
-}
-
-// Reset everything
-function resetEverything() {
-    // Reset inputs
-    incomeInput.value = '';
-    subscriptionInput.value = '';
-    savingsInput.value = '';
-    productTitleInput.value = '';
-    userAmountInput.value = '';
-    categorySelect.value = 'food'; // or any default value
-
-    // Reset budget and expenses
-    budget = 0;
-    expenses = {
-        food: 0,
-        transport: 0,
-        entertainment: 0,
-        fashion: 0,
-        others: 0
-    };
-
-    // Clear expense list
-    listContainer.innerHTML = '';
-
-    // Reset category spending
-    updateCategorySpending();
-
-    // Save reset data to localStorage
-    saveToLocalStorage();
-}
-
-function clearExistingTimer() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
-    }
-}
-
-// Initialize timer
-function initializeTimer() {
-    clearExistingTimer(); // Clear any existing timer
-    timerEndTime = Date.now() + (timerDuration * 1000);
-    startTimer();
-}
-
-// Start timer with specific time left
-function startTimer() {
-    let timeLeft = timerDuration;
-
-    timer = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            showAlert(); // Restart the timer after alert
-        } else {
-            timeLeft -= 1;
-        }
-    }, 1000);
-}
-
-// Event listeners
-calculateBudgetBtn.addEventListener('click', calculateBudget);
-suggestedBudgetBtn.addEventListener('click', showSuggestedBudget);
-customBudgetBtn.addEventListener('click', showCustomBudgetForm);
-applyCustomBudgetBtn.addEventListener('click', applyCustomBudget);
-backToSuggestedBudgetBtn.addEventListener('click', showSuggestedBudget);
-addExpenseBtn.addEventListener('click', addExpense);
-
-// Load initial data and start the timer when the page loads
-window.onload = () => {
-    loadFromLocalStorage();
-    initializeTimer();
-};
 
 const overallHistoryContainer = document.getElementById('overall-history-list');
 
 function updateOverallExpenseList() {
     const savedList = JSON.parse(localStorage.getItem('expenseList')) || [];
     overallHistoryContainer.innerHTML = ''; // Clear existing entries
-    
+
     savedList.forEach(entry => {
         const expenseEntry = document.createElement('div');
         expenseEntry.className = 'expense-entry';
         expenseEntry.innerHTML = `
-            <span>${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}</span>
-            <button class="edit" onclick="editOverallExpense(this)"><i class="fa-solid fa-pen-to-square"></i></button>
+            <span>${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}${entry.edit ? ' (edit)' : ''}</span>
             <button class="delete" onclick="deleteOverallExpense(this)"><i class="fa-solid fa-trash-can"></i></button>
         `;
         overallHistoryContainer.appendChild(expenseEntry);
     });
-}
-
-
-function editOverallExpense(button) {
-    const entry = button.parentElement;
-    const span = entry.querySelector('span');
-    const textContent = span.textContent;
-
-    // Extract data from textContent
-    const match = textContent.match(/^(\w+)\s*-\s*(.*?)\s*-\s*\$(\d+(\.\d+)?)\s*-\s*(.+)$/);
-    if (!match) {
-        console.error("Failed to parse expense entry. Check format:", textContent);
-        return;
-    }
-
-    const [, originalCategory, originalTitle, originalAmountStr] = match;
-    const originalAmount = parseFloat(originalAmountStr);
-
-    if (isNaN(originalAmount)) {
-        console.error('Original amount is NaN. Value:', originalAmountStr);
-        return;
-    }
-
-    // Prompt user for new values
-    const newTitle = prompt('Change the title:', originalTitle) || originalTitle;
-    let newAmountStr = prompt('Change the amount:', originalAmount.toFixed(2)) || originalAmount.toFixed(2);
-    let newAmount = parseFloat(newAmountStr);
-
-    if (isNaN(newAmount)) {
-        console.error('New amount is NaN. Value:', newAmountStr);
-        newAmount = originalAmount; // Revert to original amount if invalid
-    }
-
-    let newCategory = prompt('Change the category (food, transport, entertainment, fashion, others):', originalCategory.toLowerCase()) || originalCategory.toLowerCase();
-
-    // Validate category
-    if (!expenses.hasOwnProperty(newCategory)) {
-        alert('Invalid category. Keeping the original category.');
-        newCategory = originalCategory.toLowerCase();
-    }
-
-    // Remove old entry
-    entry.remove();
-
-    // Create new entry
-    const newEntry = {
-        title: newTitle,
-        amount: newAmount,
-        category: newCategory,
-        date: new Date().toLocaleString()
-    };
-
-    const newExpenseElement = document.createElement('div');
-    newExpenseElement.className = 'expense-entry';
-    newExpenseElement.innerHTML = `
-        <span>${newCategory.charAt(0).toUpperCase() + newCategory.slice(1)} - ${newTitle} - $${newAmount.toFixed(2)} - ${newEntry.date}</span>
-        <button class="edit" onclick="editOverallExpense(this)"><i class="fa-solid fa-pen-to-square"></i></button>
-        <button class="delete" onclick="deleteOverallExpense(this)"><i class="fa-solid fa-trash-can"></i></button>
-    `;
-    overallHistoryContainer.appendChild(newExpenseElement);
-
-    // Update localStorage without affecting the budget
-    updateLocalStorageWithEdit(textContent, newEntry);
 }
 
 
@@ -572,3 +528,24 @@ function deleteOverallExpense(button) {
     
     localStorage.setItem('expenseList', JSON.stringify(savedList));
 }
+
+function deleteOverallExpenseFromHistory(textContent) {
+    let savedList = JSON.parse(localStorage.getItem('expenseList')) || [];
+    savedList = savedList.filter(entry => 
+        `${entry.category.charAt(0).toUpperCase() + entry.category.slice(1)} - ${entry.title} - $${entry.amount.toFixed(2)} - ${entry.date}${entry.edit ? ' (edit)' : ''}` !== textContent
+    );
+    localStorage.setItem('expenseList', JSON.stringify(savedList));
+}
+
+// Event listeners
+calculateBudgetBtn.addEventListener('click', calculateBudget);
+suggestedBudgetBtn.addEventListener('click', showSuggestedBudget);
+customBudgetBtn.addEventListener('click', showCustomBudgetForm);
+applyCustomBudgetBtn.addEventListener('click', applyCustomBudget);
+backToSuggestedBudgetBtn.addEventListener('click', showSuggestedBudget);
+addExpenseBtn.addEventListener('click', addExpense);
+
+// Load initial data and start the timer when the page loads
+window.onload = () => {
+    loadFromLocalStorage();
+};

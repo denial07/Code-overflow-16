@@ -112,6 +112,7 @@ body {
     width: 5em;
     margin: 1.2em;
     align-items: center;
+
 }
 .product-title {
     margin-bottom: 1em;
@@ -207,6 +208,32 @@ body {
 }
 
 .overall-history-container .expense-entry button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Overall Expense History */
+.list-container {
+    background-color: #ffffff;
+    padding: 1.8em 1.2em;
+    box-shadow: 0 0.6em 1.2em rgba(28, 0, 80, 0.06);
+    border-radius: 0.6em;
+    margin-top: 1em;
+}
+
+.expense-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.expense-entry span {
+    flex: 1;
+}
+
+.expense-entry button {
     background: none;
     border: none;
     cursor: pointer;
