@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let userAnswers = [];
     let currentQuestion = {};
+    let hasSubmitted = false;
 
     function startQuiz() {
         startBtn.classList.add('hidden');
@@ -119,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuestionIndex = 0;
         score = 0;
         userAnswers = [];
+        hasSubmitted = false;
         showQuestion();
     }
 
@@ -137,57 +139,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     </label>
                 </div>
             `).join('');
-            nextBtn.textContent = 'Submit'; // Change button text to 'Submit'
+            nextBtn.textContent = 'Submit';
         } else if (currentQuestion.type === 'open-ended') {
             optionsContainer.innerHTML = `
                 <textarea id="open-ended-answer" rows="4" placeholder="Your answer here..."></textarea>
             `;
-            nextBtn.textContent = 'Submit'; // Change button text to 'Submit'
+            nextBtn.textContent = 'Submit'; 
         }
         feedbackContainer.innerHTML = '';
+        hasSubmitted = false; 
     }
 
     function handleNext() {
-        const question = currentQuestion;
-        let selectedAnswer;
+        if (!hasSubmitted) {
+            // Handle submission
+            const question = currentQuestion;
+            let selectedAnswer;
 
-        if (question.options) {
-            const selectedOption = document.querySelector('input[name="option"]:checked');
-            if (selectedOption) {
-                selectedAnswer = parseInt(selectedOption.value);
-                userAnswers.push({ question: question.question, answer: selectedAnswer });
-                if (selectedAnswer === question.answer) {
-                    score++;
-                    feedbackContainer.innerHTML = `<p class="feedback correct">Correct! ${question.detailedFeedback}</p>`;
+            if (question.options) {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (selectedOption) {
+                    selectedAnswer = parseInt(selectedOption.value);
+                    userAnswers.push({ question: question.question, answer: selectedAnswer });
+                    if (selectedAnswer === question.answer) {
+                        score++;
+                        feedbackContainer.innerHTML = `<p class="feedback correct">Correct! ${question.detailedFeedback}</p>`;
+                    } else {
+                        feedbackContainer.innerHTML = `<p class="feedback incorrect">Incorrect. ${question.detailedFeedback}</p>`;
+                    }
                 } else {
-                    feedbackContainer.innerHTML = `<p class="feedback incorrect">Incorrect. ${question.detailedFeedback}</p>`;
+                    alert('Please select an option.');
+                    return;
                 }
-            } else {
-                alert('Please select an option.');
-                return;
-            }
-        } else if (question.type === 'open-ended') {
-            selectedAnswer = document.getElementById('open-ended-answer').value;
-            userAnswers.push({ question: question.question, answer: selectedAnswer });
-            if (selectedAnswer.trim()) { // Award point for any non-empty answer
-                score++;
-                feedbackContainer.innerHTML = `<p class="feedback">Your answer: ${selectedAnswer}. ${question.detailedFeedback}</p>`;
-            } else {
+            } else if (question.type === 'open-ended') {
+                selectedAnswer = document.getElementById('open-ended-answer').value;
+                userAnswers.push({ question: question.question, answer: selectedAnswer });
+                if (selectedAnswer.trim()) { // Award point for any non-empty answer
+                    score++;
+                }
                 feedbackContainer.innerHTML = `<p class="feedback">Your answer: ${selectedAnswer}. ${question.detailedFeedback}</p>`;
             }
-        }
-        currentQuestionIndex++;
+
         
-        // Update the button text back to 'Next' for the next question
-        nextBtn.textContent = 'Next';
-        
-        if (currentQuestionIndex < quizQuestions.length) {
-            setTimeout(showQuestion, 3000); // Delay showing the next question to let user read feedback
-            showQuestion();
+            nextBtn.textContent = 'Next';
+            hasSubmitted = true; 
         } else {
-            setTimeout(showResult, 2000); // Delay showing the result
+           
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                showResult();
+            }
         }
-        
     }
 
     function showResult() {
