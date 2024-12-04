@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Budgetting App</title>
+    <link rel="stylesheet" href="official.css">
+</head>
+
+<body>
+    <main class="main">
+        <header class="header">
+            <a href="#" class="logo">Financify.</a>
+            <nav class="navbar">
+                <a href="#" class="active">Home</a>
+                <a href="hackaton.html" target="_blank">Budget</a>
+            </nav>            
+        </header>
+
+        <div class="container">
+            <section class="quiz-section">
+                <div class="quiz-box">
+                    <h1>Financial Knowledge Quiz</h1>
+                    <div class="quiz-header">
+                        <span>Test your knowledge!!!</span>
+                        <span class="header-score">Score: 0 / 5</span>
+                    </div>
+
+                    <h2 class="question-text">What is an essential first step in budgeting?</h2>
+
+                    <div class="option-list">
+                    </div>
+
+                    <div class="quiz-footer">
+                        <span class="question-total">1 of 5 Questions</span>
+                        <button class="next-btn">Next</button>
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <h2>Quiz Results!</h2>
+                    <div class="percentage-container">
+                        <div class="circular-progress">
+                            <span class="progress-value">0%</span>
+                        </div>
+
+                        <span class="score-text">You scored 0 out of 5</span>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="tryAgain-btn">Try Again</button>
+                        <button class="goHome-btn">Go back to Home</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="home">
+                <div class="home-content">
+                    <h1 id="above-start-button">Welcome to <b>Financify</b>!</h1>
+                    <p id="welcome-message">This website not only assesses your financial literacy but also provides practical support with our budgeting app. We encourage you to explore and take advantage of this valuable resource!</p>
+                    <button class="start-btn">Start Quiz</button>
+                </div>
+            </section>
+        </div>
+    </main>
+<div class="popup-info">
+    <h2>Quiz Guide</h2>
+    <span class="info">This is a quiz to text your Financial literacy</span>
+
+    <div class="btn-group">
+        <button class="info-btn exit-btn">Exit Quiz</button>
+        <a href="#" class="info-btn continue-btn">Continue</a>
+    </div>
+</div>
+    <script src="questions.js"></script>
+    <script src="official.js"></script>
+</body>
+</html>
